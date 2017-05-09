@@ -1,0 +1,5 @@
+OS   Windows10 Home
+CPU  Intel(R)Core(TM)i3-5005U CPU @ 2.00GHz 2.00GHz
+RAM  4.00GB
+GPU  Intel(R) HD Graphics 5500
+HDD  453 GB
