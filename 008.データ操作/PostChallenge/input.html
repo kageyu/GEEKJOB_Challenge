@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>入力フィールド</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>入力して送信ボタンを押してください<br>twitterが140文字制限なのはIEでのGETのURL文字数制限とは関係ないそうです<br></div>
+        <form action="./output.jsp" method="post"><br>
+            名前<input type ="text" name="name"><br>
+            <input type ="radio" name="sex" value="1">男性
+            <input type ="radio" name="sex" Value="2">女性<br>
+            趣味<textarea name="hobby"></textarea><br>
+            <input type="submit" name="Submit" value="送信">
+        </form>
+        <footer>
+        2017/5/31 更新
+        </footer>
+    </body>
+    
+</html>
