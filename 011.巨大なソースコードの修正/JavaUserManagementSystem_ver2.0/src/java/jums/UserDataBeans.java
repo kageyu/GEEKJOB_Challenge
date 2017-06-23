@@ -1,8 +1,10 @@
 package jums;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * ページで入出力されるユーザー情報を持ちまわるJavaBeans。DTOと違い画面表示系への結びつきが強い
@@ -10,6 +12,7 @@ import java.util.Calendar;
  * @author hayashi-s
  */
 public class UserDataBeans implements Serializable{
+    private int userID;
     private String name;
     private int year;
     private int month;
@@ -17,8 +20,10 @@ public class UserDataBeans implements Serializable{
     private String tell;
     private int type ;
     private String comment;
+    private Timestamp newDate;
     
     public UserDataBeans(){
+        this.userID = 0;
         this.name = "";
         this.year = 0;
         this.month = 0;
@@ -26,6 +31,13 @@ public class UserDataBeans implements Serializable{
         this.tell = "";
         this.type = 0;
         this.comment= "";
+    }
+    
+    public int getUserID() {
+        return userID;
+    }
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
     
     public String getName() {
@@ -73,6 +85,7 @@ public class UserDataBeans implements Serializable{
             this.day = Integer.parseInt(day);
         }
     }
+    
 
     public String getTell() {
         return tell;
@@ -108,6 +121,13 @@ public class UserDataBeans implements Serializable{
         }
     }
     
+    public Timestamp getNewDate() {
+        return newDate;
+    }
+    public void setNewDate(Timestamp newDate) {
+        this.newDate = newDate;
+    }
+    
     public ArrayList<String> chkproperties(){
         ArrayList<String> chkList = new ArrayList<String>();
         if(this.name.equals("")){
@@ -136,21 +156,22 @@ public class UserDataBeans implements Serializable{
     }
 
     public void UD2DTOMapping(UserDataDTO udd){
+        udd.setUserID(this.userID);
         udd.setName(this.name);
         if(this.year != 0 || this.month != 0 || this.day != 0){
-            Calendar birthday = Calendar.getInstance();
+            Calendar birthdayC = Calendar.getInstance();
             if(this.month == 0 || this.day == 0){
-                birthday.set(this.year,0,1);
+                birthdayC.set(this.year,0,1);
             }else{
-                birthday.set(this.year,(this.month)-1,this.day);
+                birthdayC.set(this.year,(this.month)-1,this.day);
             }
-            udd.setBirthday(birthday.getTime());
+            udd.setBirthday(birthdayC.getTime());
         }else{
             udd.setBirthday(null);
         }
         udd.setTell(this.tell);
         udd.setType(this.type);
         udd.setComment(this.comment);
+        udd.setNewDate(this.newDate);
     }
-    
 }

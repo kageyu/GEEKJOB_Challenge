@@ -1,6 +1,7 @@
 package jums;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -66,6 +67,19 @@ public class UserDataDTO {
     }
     public void setNewDate(Timestamp newDate) {
         this.newDate = newDate;
+    }
+    public void DTO2UDMapping(UserDataBeans udb){
+        udb.setUserID(this.userID);
+        udb.setName(this.name);
+        Calendar birthdayC = Calendar.getInstance();
+        birthdayC.setTime(this.birthday);
+        udb.setYear(String.valueOf(birthdayC.get(Calendar.YEAR)));
+        udb.setMonth(String.valueOf(birthdayC.get(Calendar.MONTH)+1));
+        udb.setDay(String.valueOf(birthdayC.get(Calendar.DAY_OF_MONTH)));
+        udb.setTell(this.tell);
+        udb.setType(String.valueOf(this.type));
+        udb.setComment(this.comment);
+        udb.setNewDate(this.newDate);
     }
 
 }

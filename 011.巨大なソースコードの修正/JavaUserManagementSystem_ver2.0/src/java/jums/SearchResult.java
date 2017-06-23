@@ -1,12 +1,12 @@
 package jums;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.ResultSet;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -26,20 +26,59 @@ public class SearchResult extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try{
-            request.setCharacterEncoding("UTF-8");//リクエストパラメータの文字コードをUTF-8に変更
-        
-            //フォームからの入力を取得して、JavaBeansに格納
+            request.setCharacterEncoding("UTF-8");//リクエストパラメータ/セッションの文字コードをUTF-8に変更
+            
+            //検索用のUserDataBeansを宣言
             UserDataBeans udb = new UserDataBeans();
-            udb.setName(request.getParameter("name"));
-            udb.setYear(request.getParameter("year"));
-            udb.setType(request.getParameter("type"));
+            
+            //条件分岐用のフラグを宣言
+            boolean frag = false;
+            
+            //セッションスタート
+            HttpSession session = request.getSession();
+            request.setCharacterEncoding("UTF-8");//リクエストパラメータの文字コードをUTF-8に変更
+            
+            //アクセス元がSearchの場合フォームからの入力を取得してUserDataBeansに格納
+            String accesschk = request.getParameter("ac");
+            if(accesschk !=null && Integer.parseInt(accesschk)==(Integer)session.getAttribute("ac")){
+                frag = true;
+                udb.setName(request.getParameter("name"));
+                udb.setYear(request.getParameter("year"));
+                udb.setType(request.getParameter("type"));
+                //検索条件が入ったUDBをセッションに格納（更新/削除後の表示の為にトップに戻るまで保持）
+                session.setAttribute("searchcondition", udb);
+            }
+            
+            //セッションに格納されているデータを元に条件分岐
+            //アクセス元がSearch以外で検索結果のリストを保持している場合は何もせずにjspに飛ばす
+            //検索条件を保持していれば引き出して検索
+            if(frag || null == session.getAttribute("resultDataList")){
+                if(null != session.getAttribute("searchcondition")){
+                    udb = (UserDataBeans)session.getAttribute("searchcondition");
+                
+                    //UserDataBeansをDTOオブジェクトにマッピング。DB専用のパラメータに変換
+                    UserDataDTO searchData = new UserDataDTO();
+                    udb.UD2DTOMapping(searchData);
 
-            //DTOオブジェクトにマッピング。DB専用のパラメータに変換
-            UserDataDTO searchData = new UserDataDTO();
-            udb.UD2DTOMapping(searchData);
+                    //検索
+                    ArrayList<UserDataDTO> searchResultList = UserDataDAO .getInstance().search(searchData);
+                    
+                    //検索結果リストをUDBリストにマッピング
+                    ArrayList<UserDataBeans> resultDataList = new ArrayList();
+                    for(UserDataDTO searchResult: searchResultList){
+                        UserDataBeans UDB = new UserDataBeans();
+                        searchResult.DTO2UDMapping(UDB);
+                        resultDataList.add(UDB);
+                    }
 
-            UserDataDTO resultData = UserDataDAO .getInstance().search(searchData);
-            request.setAttribute("resultData", resultData);
+                    //検索結果をセッションに格納（検索結果と詳細をスムーズに行き来するために、削除/更新に進むかトップに戻るまで保持）
+                    session.setAttribute("resultDataList", resultDataList);
+
+                //アクセス元がSearch以外で検索結果も検索条件もない場合はエラーページに飛ばします
+                }else{
+                    throw new Exception("不正なアクセスです");
+                }
+            }
             
             request.getRequestDispatcher("/searchresult.jsp").forward(request, response);  
         }catch(Exception e){

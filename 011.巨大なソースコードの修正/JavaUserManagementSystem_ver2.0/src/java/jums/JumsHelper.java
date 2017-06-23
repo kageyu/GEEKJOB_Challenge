@@ -8,16 +8,41 @@ import java.util.ArrayList;
  */
 public class JumsHelper {
     
-    //トップへのリンクを定数として設定
-    private final String homeURL = "index.jsp";
-    
     public static JumsHelper getInstance(){
         return new JumsHelper();
     }
     
+    //トップへのリンクを定数として設定
+    private final String homeURL = "Index";
+    
     //トップへのリンクを返却
     public String home(){
         return "<a href=\""+homeURL+"\">トップへ戻る</a>";
+    }
+    
+    //検索結果へのリンクを定数として設定
+    private final String SR_URL = "SearchResult";
+    
+    //検索結果へのリンクを返却
+    public String SR(){
+        return "<a href=\""+SR_URL+"\"> 検索結果に戻る</a>";
+    }
+    //検索画面へのリンクを定数として設定
+    private final String S_URL = "Search";
+    
+    //検索画面へのリンクを返却
+    public String S(){
+        return "<a href=\""+S_URL+"\"> 検索画面に戻る</a>";
+    }
+    
+    //詳細画面へのリンクを定数として設定
+    private final String RD_URL = "resultdetail.jsp";
+    
+    //詳細画面へ戻るボタンを返却
+    public String RD(){
+        return "<form action=\"ResultDetail\" method=\"POST\">\n" +
+"<input type=\"submit\" name=\"NO\" value=\"詳細画面に戻る\"style=\"width:120px\">\n" +
+"</form>";
     }
     
     /**

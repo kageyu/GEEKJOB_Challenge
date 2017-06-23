@@ -1,11 +1,12 @@
 package jums;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -27,12 +28,31 @@ public class ResultDetail extends HttpServlet {
         try{
             request.setCharacterEncoding("UTF-8");//リクエストパラメータの文字コードをUTF-8に変更
 
-            //DTOオブジェクトにマッピング。DB専用のパラメータに変換
-            UserDataDTO searchData = new UserDataDTO();
-            searchData.setUserID(2);
+            //セッションに格納する用のUserDataBeansを宣言
+            UserDataBeans udb = new UserDataBeans();
+            
+            //セッションに格納されているデータを元に条件分岐
+            HttpSession session = request.getSession();
+            //検索結果リストが無ければ個別の情報があるのでそれを取り出す(保守性×)
+            if(null == session.getAttribute("resultDataList") && null != session.getAttribute("resultData")){
+                udb = (UserDataBeans)session.getAttribute("resultData");
+            }else if(null != session.getAttribute("resultDataList")){
+                //セッションから検索結果リストを取り出す
+                ArrayList<UserDataBeans> UDBList = (ArrayList<UserDataBeans>)session.getAttribute("resultDataList");
 
-            UserDataDTO resultData = UserDataDAO .getInstance().searchByID(searchData);
-            request.setAttribute("resultData", resultData);
+                //リンクで指定されていたIDのユーザー情報だけを選別
+                int id = Integer.parseInt(request.getParameter("id"));
+                for(UserDataBeans UDB : UDBList){
+                    if(UDB.getUserID() == id){
+                        udb = UDB;
+                        break;
+                    }
+                }
+            //検索結果も個別の情報もない場合はエラーページに飛ばす
+            }else{
+                throw new Exception("不正なアクセスです");
+            }
+            session.setAttribute("resultData", udb);
             
             request.getRequestDispatcher("/resultdetail.jsp").forward(request, response);  
         }catch(Exception e){
